@@ -183,17 +183,6 @@
   .field select option{ background:var(--panel-2); color:var(--text); }
   .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); outline:none; }
   .field textarea{ resize:vertical; min-height:90px; }
-  .form-alt{
-    font-size:13px; color:var(--muted); border-bottom:1px solid var(--line);
-    padding-bottom:2px; transition:all .2s;
-  }
-  .form-alt:hover{ color:var(--accent); border-color:var(--accent); }
-  .form-alt.disabled{
-    opacity:.4; pointer-events:none; cursor:not-allowed;
-  }
-  .form-alt-group{ display:flex; flex-direction:column; gap:8px; }
-  .form-alt-lbl{ font-size:12px; color:var(--muted); }
-  .form-alt-links{ display:flex; gap:18px; flex-wrap:wrap; }
   .submit-btn{
     background:var(--accent); color:#161217; border:none;
     padding:15px 28px; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; justify-self:start;
@@ -202,12 +191,62 @@
   .submit-btn:disabled{
     background:var(--panel-2); color:var(--muted); cursor:not-allowed;
   }
+  .submit-btn-alt{
+    background:transparent; border:1px solid var(--line); color:var(--text);
+  }
+  .submit-btn-alt:hover:not(:disabled){ border-color:var(--accent); color:var(--accent); background:transparent; }
+  .submit-btn-alt:disabled{ background:transparent; border-color:var(--line); color:var(--muted); }
   .field-error{
     font-size:12px; color:#c9645a; display:none; margin-top:2px;
   }
   .field.invalid .field-error{ display:block; }
   .field.invalid input{ border-color:#c9645a; }
   .form-note{ font-size:13px; color:var(--muted); margin-top:2px; }
+  .confirm-step{
+    display:none; flex-direction:column; gap:12px;
+    background:var(--panel-2); border:1px solid var(--line);
+    padding:18px 20px; border-radius:3px;
+  }
+  .confirm-step.visible{ display:flex; }
+  .confirm-step p{ font-size:14px; color:var(--text); }
+  .confirm-btn{
+    background:var(--accent); color:#161217; border:none;
+    padding:12px 22px; font-size:13px; font-weight:600;
+    border-radius:2px; cursor:pointer; transition:all .2s; justify-self:start;
+  }
+  .confirm-btn:hover{ background:#cba46a; }
+
+  .email-choice{
+    display:none; flex-direction:column; gap:14px;
+    background:var(--panel-2); border:1px solid var(--line);
+    padding:20px; border-radius:3px;
+  }
+  .email-choice.visible{ display:flex; }
+  .email-choice p{ font-size:13px; color:var(--muted); }
+  .email-choice-btns{ display:flex; gap:10px; flex-wrap:wrap; }
+  .email-choice-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 18px; font-size:13px; font-weight:600;
+    border:1px solid var(--line); border-radius:2px; background:transparent;
+    color:var(--text); cursor:pointer; transition:all .2s;
+  }
+  .email-choice-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .email-choice-cancel{ font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline; justify-self:start; }
+
+  @keyframes successPop{
+    0%{ opacity:0; transform:translateY(-6px) scale(.98); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .success-banner{
+    display:none; align-items:flex-start; gap:14px;
+    background:rgba(184,147,90,0.14); border:1.5px solid var(--accent);
+    padding:22px 24px; border-radius:4px;
+    animation:successPop .35s ease;
+  }
+  .success-banner.visible{ display:flex; }
+  .success-banner svg{ width:26px; height:26px; flex-shrink:0; color:var(--accent); margin-top:2px; }
+  .success-banner .success-title{ font-size:17px; font-weight:700; color:var(--text); font-family:'Space Grotesk', sans-serif; }
+  .success-banner .success-sub{ font-size:14px; color:var(--muted); margin-top:4px; }
 
   footer{
     padding:36px 0; border-top:1px solid var(--line);
@@ -266,7 +305,6 @@
     .submit-btn{ width:100%; text-align:center; justify-self:stretch; }
     .hero-cta{ flex-direction:column; }
     footer{ flex-direction:column; align-items:flex-start; }
-    #gmailBtn, #outlookBtn{ display:none !important; }
   }
 
   @media (max-width: 380px){
@@ -447,7 +485,7 @@
         </a>
       </div>
     </div>
-    <form id="bookingForm" onsubmit="return sendBooking(event)">
+    <form id="bookingForm">
       <div class="field">
         <label for="name">Nom complet</label>
         <input id="name" type="text" required placeholder="Ton nom complet">
@@ -470,15 +508,32 @@
         <label for="msg">Message</label>
         <textarea id="msg" placeholder="Ton projet, la date souhaitée"></textarea>
       </div>
-      <button class="submit-btn" id="waBtn" type="submit" disabled>Envoyer sur WhatsApp</button>
-      <div class="form-alt-group">
-        <span class="form-alt-lbl">ou envoyer un e-mail avec :</span>
-        <div class="form-alt-links">
-          <a class="form-alt disabled" id="mailBtn" href="#" onclick="return openMail('native')">Mail</a>
-          <a class="form-alt disabled" id="gmailBtn" href="#" onclick="return openMail('gmail')">Gmail</a>
-          <a class="form-alt disabled" id="outlookBtn" href="#" onclick="return openMail('outlook')">Outlook</a>
+      <button class="submit-btn" id="waBtn" type="button" onclick="sendBooking()" disabled>Envoyer sur WhatsApp</button>
+      <button class="submit-btn submit-btn-alt" id="emailBtn" type="button" onclick="showEmailChoice()" disabled>Envoyer par mail</button>
+
+      <div class="email-choice" id="emailChoice">
+        <p>Ouvrir avec :</p>
+        <div class="email-choice-btns">
+          <button type="button" class="email-choice-btn" onclick="sendEmail('gmail')">Gmail</button>
+          <button type="button" class="email-choice-btn" onclick="sendEmail('outlook')">Outlook</button>
+          <button type="button" class="email-choice-btn" onclick="sendEmail('mailto')">Application Mail</button>
+        </div>
+        <button type="button" class="email-choice-cancel" onclick="hideEmailChoice()">Annuler</button>
+      </div>
+
+      <div class="confirm-step" id="confirmStep">
+        <p id="confirmQuestion"></p>
+        <button type="button" class="confirm-btn" onclick="confirmSent()">Ça y est, j'ai envoyé</button>
+      </div>
+
+      <div class="success-banner" id="successBanner">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="success-title" id="successTitle"></div>
+          <div class="success-sub" id="successSub"></div>
         </div>
       </div>
+
       <div class="form-note">Remplis ton nom et un numéro valide pour activer l'envoi.</div>
     </form>
   </div>
@@ -535,7 +590,6 @@ function isFormValid(){
 }
 
 function updateFormState(){
-  const nameVal = document.getElementById('name').value.trim();
   const phoneVal = document.getElementById('phone').value.trim();
   const phoneField = document.getElementById('phone').closest('.field');
   const valid = isFormValid();
@@ -547,15 +601,8 @@ function updateFormState(){
     phoneField.classList.remove('invalid');
   }
 
-  const waBtn = document.getElementById('waBtn');
-  const mailBtn = document.getElementById('mailBtn');
-  const gmailBtn = document.getElementById('gmailBtn');
-  const outlookBtn = document.getElementById('outlookBtn');
-
-  waBtn.disabled = !valid;
-  [mailBtn, gmailBtn, outlookBtn].forEach(btn => {
-    btn.classList.toggle('disabled', !valid);
-  });
+  document.getElementById('waBtn').disabled = !valid;
+  document.getElementById('emailBtn').disabled = !valid;
 
   const note = document.querySelector('.form-note');
   if (!valid){
@@ -584,8 +631,9 @@ function getBookingText(){
   return { name, phone, service, msg, body };
 }
 
-function sendBooking(e){
-  e.preventDefault();
+let pendingChannel = null;
+
+function sendBooking(){
   if (!isFormValid()){
     updateFormState();
     return false;
@@ -597,11 +645,14 @@ function sendBooking(e){
   const url = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(text);
 
   window.open(url, '_blank');
-  document.querySelector('.form-note').textContent = 'WhatsApp s\'ouvre dans un nouvel onglet avec le message prêt.';
+  pendingChannel = 'whatsapp';
+  armAutoDetect();
+  hideEmailChoice();
+  showConfirmStep("Redirection vers WhatsApp... reviens sur cet onglet une fois le message envoyé.");
   return false;
 }
 
-function openMail(type){
+function sendEmail(provider){
   if (!isFormValid()){
     updateFormState();
     return false;
@@ -610,25 +661,87 @@ function openMail(type){
   const to = 'Pointrap.mts.be@gmail.com';
   const subject = 'Réservation Point Rap';
 
-  let url;
-  if (type === 'gmail'){
-    url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(to)
-        + '&su=' + encodeURIComponent(subject)
-        + '&body=' + encodeURIComponent(body);
+  if (provider === 'gmail'){
+    const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(to) +
+      '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     window.open(url, '_blank');
-  } else if (type === 'outlook'){
-    url = 'https://outlook.live.com/mail/0/deeplink/compose?to=' + encodeURIComponent(to)
-        + '&subject=' + encodeURIComponent(subject)
-        + '&body=' + encodeURIComponent(body);
+  } else if (provider === 'outlook'){
+    const url = 'https://outlook.live.com/mail/0/deeplink/compose?to=' + encodeURIComponent(to) +
+      '&subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     window.open(url, '_blank');
   } else {
-    url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject)
-        + '&body=' + encodeURIComponent(body);
+    const url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     window.location.href = url;
   }
 
-  document.querySelector('.form-note').textContent = 'Le message est prêt avec tes infos, il ne reste qu\'à l\'envoyer.';
+  hideEmailChoice();
+  pendingChannel = 'email';
+  armAutoDetect();
+  showConfirmStep("Redirection en cours... reviens sur cet onglet une fois le mail envoyé.");
   return false;
+}
+
+function showEmailChoice(){
+  if (!isFormValid()){
+    updateFormState();
+    return false;
+  }
+  document.getElementById('emailChoice').classList.add('visible');
+  document.getElementById('successBanner').classList.remove('visible');
+  document.querySelector('.form-note').textContent = '';
+}
+
+function hideEmailChoice(){
+  document.getElementById('emailChoice').classList.remove('visible');
+}
+
+function showConfirmStep(question){
+  document.getElementById('confirmQuestion').textContent = question;
+  document.getElementById('confirmStep').classList.add('visible');
+  document.getElementById('successBanner').classList.remove('visible');
+  document.querySelector('.form-note').textContent = '';
+}
+
+let autoDetectArmed = false;
+let leftTab = false;
+
+function armAutoDetect(){
+  autoDetectArmed = true;
+  leftTab = false;
+}
+
+// Astuce : quand WhatsApp ou l'appli mail s'ouvre, cet onglet perd le focus (il devient
+// "caché"). Quand l'utilisateur revient sur l'onglet, on considère que l'action a eu lieu
+// et on affiche automatiquement le message de validation, sans clic manuel.
+document.addEventListener('visibilitychange', function(){
+  if (!autoDetectArmed || !pendingChannel) return;
+
+  if (document.hidden){
+    leftTab = true;
+  } else if (leftTab){
+    // l'utilisateur est revenu sur l'onglet après être parti vers WhatsApp/le mail
+    autoDetectArmed = false;
+    confirmSent();
+  }
+});
+
+function confirmSent(){
+  autoDetectArmed = false;
+  document.getElementById('confirmStep').classList.remove('visible');
+
+  const title = document.getElementById('successTitle');
+  const sub = document.getElementById('successSub');
+
+  if (pendingChannel === 'whatsapp'){
+    title.textContent = 'Votre réservation est bien prise en compte.';
+    sub.textContent = 'Attendez une confirmation par message.';
+  } else if (pendingChannel === 'email'){
+    title.textContent = 'Votre réservation est bien prise en compte.';
+    sub.textContent = 'Attendez une confirmation par mail.';
+  }
+  document.getElementById('successBanner').classList.add('visible');
+  document.querySelector('.form-note').textContent = '';
+  pendingChannel = null;
 }
 </script>
 
