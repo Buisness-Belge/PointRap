@@ -68,6 +68,11 @@
     border-top:1px solid var(--line); transition:color .2s;
   }
   .mobile-menu a:hover{ color:var(--text); }
+  .mobile-menu .admin-link{
+    display:block; padding:16px 32px; font-size:15px; color:var(--muted);
+    border-top:1px solid var(--line); transition:color .2s;
+  }
+  .mobile-menu .admin-link:hover{ color:var(--text); }
   .nav-toggle-input:checked ~ .mobile-menu{ display:flex; }
   .nav-toggle-input:checked ~ nav .nav-toggle span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
   .nav-toggle-input:checked ~ nav .nav-toggle span:nth-child(2){ opacity:0; }
@@ -202,37 +207,6 @@
   .field.invalid .field-error{ display:block; }
   .field.invalid input{ border-color:#c9645a; }
   .form-note{ font-size:13px; color:var(--muted); margin-top:2px; }
-  .confirm-step{
-    display:none; flex-direction:column; gap:12px;
-    background:var(--panel-2); border:1px solid var(--line);
-    padding:18px 20px; border-radius:3px;
-  }
-  .confirm-step.visible{ display:flex; }
-  .confirm-step p{ font-size:14px; color:var(--text); }
-  .confirm-btn{
-    background:var(--accent); color:#161217; border:none;
-    padding:12px 22px; font-size:13px; font-weight:600;
-    border-radius:2px; cursor:pointer; transition:all .2s; justify-self:start;
-  }
-  .confirm-btn:hover{ background:#cba46a; }
-
-  .email-choice{
-    display:none; flex-direction:column; gap:14px;
-    background:var(--panel-2); border:1px solid var(--line);
-    padding:20px; border-radius:3px;
-  }
-  .email-choice.visible{ display:flex; }
-  .email-choice p{ font-size:13px; color:var(--muted); }
-  .email-choice-btns{ display:flex; gap:10px; flex-wrap:wrap; }
-  .email-choice-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:11px 18px; font-size:13px; font-weight:600;
-    border:1px solid var(--line); border-radius:2px; background:transparent;
-    color:var(--text); cursor:pointer; transition:all .2s;
-  }
-  .email-choice-btn:hover{ border-color:var(--accent); color:var(--accent); }
-  .email-choice-cancel{ font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline; justify-self:start; }
-
   @keyframes successPop{
     0%{ opacity:0; transform:translateY(-6px) scale(.98); }
     100%{ opacity:1; transform:translateY(0) scale(1); }
@@ -282,6 +256,7 @@
   @media (max-width: 860px){
     .navlinks{ display:none; }
     .nav-toggle{ display:flex; }
+    #adminMenuLinkDesktop{ display:none; }
     .about-grid, .contact-grid{ grid-template-columns:1fr; }
     .gallery-grid{ grid-template-columns:1fr 1fr; }
     .gallery-grid figure:first-child{ grid-column:span 2; }
@@ -310,6 +285,150 @@
   @media (max-width: 380px){
     .services-grid{ grid-template-columns:1fr; }
   }
+
+  /* ===== Agenda / Booking calendar ===== */
+  .agenda{ background:var(--bg); }
+  .agenda-wrap{ display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start; }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .cal-head h3{ font-family:'Space Grotesk',sans-serif; font-size:19px; text-transform:capitalize; }
+  .cal-nav{ display:flex; gap:8px; }
+  .cal-nav button{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    width:34px; height:34px; border-radius:2px; cursor:pointer; font-size:16px;
+  }
+  .cal-nav button:hover{ border-color:var(--accent); color:var(--accent); }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .cal-dow{ text-align:center; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; padding-bottom:4px; }
+  .cal-day{
+    aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line); border-radius:2px; font-size:13px; cursor:pointer;
+    background:var(--panel-2); transition:all .15s; position:relative;
+  }
+  .cal-day:hover:not(.disabled){ border-color:var(--accent); color:var(--accent); }
+  .cal-day.empty{ visibility:hidden; cursor:default; }
+  .cal-day.disabled{ color:var(--muted); opacity:.35; cursor:not-allowed; text-decoration:line-through; }
+  .cal-day.conge{ color:#c9645a; opacity:.6; cursor:not-allowed; text-decoration:line-through; }
+  .cal-day.selected{ background:var(--accent); color:#161217; border-color:var(--accent); font-weight:600; }
+  .cal-day.has-bookings::after{
+    content:''; position:absolute; bottom:4px; width:4px; height:4px; border-radius:50%; background:var(--accent);
+  }
+  .cal-day.selected.has-bookings::after{ background:#161217; }
+
+  .slots-box{ background:var(--panel); border:1px solid var(--line); padding:22px; border-radius:3px; min-height:220px; }
+  .slots-box h3{ font-family:'Space Grotesk',sans-serif; font-size:17px; margin-bottom:14px; }
+  .slots-hint{ color:var(--muted); font-size:13px; }
+  .slots-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:10px; }
+  .slot-btn{
+    padding:11px 8px; text-align:center; font-size:13px; border-radius:2px; cursor:pointer;
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text); transition:all .15s;
+    font-family:'Space Mono',monospace;
+  }
+  .slot-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .slot-btn.taken{
+    background:transparent; color:#c9645a; border-color:rgba(201,100,90,0.4); cursor:pointer; opacity:.85;
+  }
+  .slot-btn.taken:hover{ border-color:#c9645a; }
+  .slot-btn.picked{ background:var(--accent); color:#161217; border-color:var(--accent); font-weight:700; }
+  .picked-summary{
+    margin-top:16px; padding:12px 14px; background:var(--panel-2); border:1px solid var(--accent);
+    border-radius:2px; font-size:13px; display:none;
+  }
+  .picked-summary.visible{ display:block; }
+
+  /* modal (booking details / admin) */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; z-index:300; background:rgba(13,12,14,0.75);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.visible{ display:flex; }
+  .modal-box{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:4px; padding:26px;
+    max-width:420px; width:100%; max-height:80vh; overflow-y:auto;
+  }
+  .modal-box h3{ font-family:'Space Grotesk',sans-serif; font-size:19px; margin-bottom:16px; }
+  .modal-row{ display:flex; flex-direction:column; gap:2px; padding:10px 0; border-top:1px solid var(--line); }
+  .modal-row:last-of-type{ border-bottom:1px solid var(--line); }
+  .modal-row .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .modal-row .val{ font-size:14px; }
+  .modal-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .modal-actions button{
+    padding:10px 18px; font-size:13px; font-weight:600; border-radius:2px; cursor:pointer; border:none;
+  }
+  .btn-danger{ background:#c9645a; color:#161217; }
+  .btn-danger:hover{ background:#e07a6f; }
+  .btn-ghost-modal{ background:transparent; border:1px solid var(--line) !important; color:var(--text); }
+  .btn-ghost-modal:hover{ border-color:var(--text) !important; }
+
+  /* admin */
+  .admin-link{ cursor:pointer; }
+  .admin-bar{
+    display:none; position:sticky; top:72px; z-index:90; background:#2a1f14; border-bottom:1px solid var(--accent);
+    padding:10px 0; font-size:13px;
+  }
+  .admin-bar.visible{ display:block; }
+  .admin-bar .wrap{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .admin-bar .tag{ color:var(--accent); font-family:'Space Mono',monospace; font-weight:700; letter-spacing:.05em; }
+  .admin-bar button{
+    background:transparent; border:1px solid var(--accent); color:var(--accent);
+    padding:6px 14px; font-size:12px; border-radius:2px; cursor:pointer;
+  }
+  .admin-bar button:hover{ background:var(--accent); color:#161217; }
+  .admin-panel{
+    display:none; position:fixed; inset:0; z-index:250; background:rgba(13,12,14,0.75);
+    align-items:flex-start; justify-content:center; padding:90px 20px 60px;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .admin-panel.visible{ display:flex; }
+  .admin-panel-box{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+    padding:22px 22px 70px; max-width:640px; width:100%; max-height:85vh; overflow-y:auto;
+    -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  }
+  .admin-panel .field input, .admin-panel .field select{
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    padding:10px 12px; font-size:14px; border-radius:2px; width:100%;
+  }
+  .admin-card{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:6px;
+    padding:16px;
+  }
+  .admin-form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width: 520px){
+    .admin-form-grid{ grid-template-columns:1fr; }
+  }
+
+  /* toast (remplace alert()) */
+  .toast-wrap{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+    z-index:300; display:flex; flex-direction:column; gap:8px; align-items:center;
+    width:100%; max-width:90vw; pointer-events:none;
+  }
+  .toast{
+    background:#1f1a15; border:1px solid var(--accent); color:var(--text);
+    padding:12px 20px; border-radius:4px; font-size:14px; box-shadow:0 6px 20px rgba(0,0,0,.35);
+    opacity:0; transform:translateY(10px); transition:opacity .25s ease, transform .25s ease;
+    max-width:420px; text-align:center;
+  }
+  .toast.visible{ opacity:1; transform:translateY(0); }
+
+  /* confirm-box (remplace confirm()) */
+  .confirm-box p{ font-size:14px; margin-bottom:18px; line-height:1.5; }
+  .admin-list{ display:grid; gap:8px; margin-top:14px; max-height:320px; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding-right:4px; }
+  .admin-list-item{
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    background:var(--panel); border:1px solid var(--line); padding:10px 12px; border-radius:2px; font-size:13px;
+  }
+  .admin-list-item button{
+    background:transparent; border:1px solid #c9645a; color:#c9645a; cursor:pointer;
+    font-size:12px; padding:5px 10px; border-radius:2px; white-space:nowrap; flex-shrink:0;
+  }
+  .admin-list-item button:hover{ background:#c9645a; color:#161217; }
+
+  @media (max-width: 860px){
+    .agenda-wrap{ grid-template-columns:1fr; }
+  }
 </style>
 </head>
 <body>
@@ -322,10 +441,12 @@
       <a href="#studio">Le studio</a>
       <a href="#services">Prestations</a>
       <a href="#galerie">Galerie</a>
+      <a href="#agenda">Agenda</a>
       <a href="#contact">Contact</a>
     </div>
     <div class="nav-right">
-      <a href="#contact" class="nav-cta">Réserver</a>
+      <button type="button" class="admin-link" id="adminMenuLinkDesktop" style="font-size:13px; color:var(--muted); background:none; border:none; font-family:inherit; cursor:pointer;">Mode admin</button>
+      <a href="#agenda" class="nav-cta">Réserver</a>
       <label for="navToggle" class="nav-toggle" aria-label="Ouvrir le menu">
         <span></span><span></span><span></span>
       </label>
@@ -335,9 +456,63 @@
     <a href="#studio" onclick="closeMenu()">Le studio</a>
     <a href="#services" onclick="closeMenu()">Prestations</a>
     <a href="#galerie" onclick="closeMenu()">Galerie</a>
+    <a href="#agenda" onclick="closeMenu()">Agenda</a>
     <a href="#contact" onclick="closeMenu()">Contact</a>
+    <button type="button" class="admin-link" id="adminMenuLink" style="text-align:left; background:none; border:none; font:inherit; cursor:pointer; width:100%;">Mode admin</button>
   </div>
 </header>
+
+<div class="admin-bar" id="adminBar">
+  <div class="wrap">
+    <span class="tag">MODE ADMIN ACTIF</span>
+    <div style="display:flex; gap:10px;">
+      <button type="button" onclick="toggleAdminPanel()">Gérer l'agenda</button>
+      <button type="button" onclick="logoutAdmin()">Quitter</button>
+    </div>
+  </div>
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-panel-box" style="display:grid; gap:16px;">
+      <div style="display:flex; justify-content:flex-end;">
+        <button type="button" onclick="toggleAdminPanel()" style="background:transparent; border:1px solid var(--line); color:var(--muted); padding:6px 14px; border-radius:2px; cursor:pointer; font-size:12px;">Fermer ✕</button>
+      </div>
+      <div class="admin-card">
+        <h4 style="font-family:'Space Grotesk',sans-serif; margin-bottom:8px;">Ajouter un rendez-vous</h4>
+        <div class="admin-form-grid">
+          <div class="field"><label>Nom</label><input type="text" id="admName"></div>
+          <div class="field"><label>Téléphone</label><input type="text" id="admPhone"></div>
+          <div class="field"><label>Prestation</label>
+            <select id="admService">
+              <option value="Enregistrement">Enregistrement</option>
+              <option value="Mixage">Mixage</option>
+              <option value="Mastering">Mastering</option>
+              <option value="Production">Production</option>
+              <option value="Live">Live</option>
+            </select>
+          </div>
+          <div class="field"><label>Date</label><input type="date" id="admDate"></div>
+          <div class="field"><label>Heure</label>
+            <select id="admTime"></select>
+          </div>
+          <div class="field"><label>Message</label><input type="text" id="admMsg"></div>
+        </div>
+        <button type="button" onclick="adminAddBooking()" style="margin-top:10px; background:var(--accent); color:#161217; border:none; padding:10px 20px; border-radius:2px; font-weight:600; cursor:pointer;">Ajouter</button>
+      </div>
+      <div class="admin-card">
+        <h4 style="font-family:'Space Grotesk',sans-serif; margin-bottom:8px;">Marquer une période de congé</h4>
+        <div class="admin-form-grid">
+          <div class="field"><label>Du</label><input type="date" id="admCongeStart"></div>
+          <div class="field"><label>Au</label><input type="date" id="admCongeEnd"></div>
+        </div>
+        <button type="button" onclick="adminAddConge()" style="margin-top:10px; background:transparent; border:1px solid var(--accent); color:var(--accent); padding:10px 16px; border-radius:2px; cursor:pointer;">Ajouter cette période</button>
+        <div class="admin-list" id="adminCongesList" style="margin-top:12px;"></div>
+      </div>
+      <div class="admin-card">
+        <h4 style="font-family:'Space Grotesk',sans-serif; margin-bottom:4px;">Tous les rendez-vous</h4>
+        <div class="admin-list" id="adminBookingsList"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <section class="hero">
   <div class="hero-bg"></div>
@@ -346,7 +521,7 @@
     <h1>POINT RAP</h1>
     <p class="sub">Enregistrement, mixage, mastering, production et live.</p>
     <div class="hero-cta">
-      <a href="#contact" class="btn btn-primary">Réserver</a>
+      <a href="#agenda" class="btn btn-primary">Réserver</a>
       <a href="#services" class="btn btn-ghost">Prestations</a>
     </div>
   </div>
@@ -432,6 +607,105 @@
   </div>
 </section>
 
+<section class="agenda" id="agenda">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Agenda</div>
+      <h2>Réserve ta session</h2>
+      <p>Remplis tes informations, puis choisis un jour et une heure libre dans le calendrier ci-dessous.</p>
+    </div>
+
+    <form id="bookingForm" style="max-width:480px; margin-bottom:40px;">
+      <div class="field">
+        <label for="name">Nom complet</label>
+        <input id="name" type="text" required placeholder="Ton nom complet">
+      </div>
+      <div class="field">
+        <label for="phone">Téléphone</label>
+        <input id="phone" type="tel" required placeholder="Ex : 0492 26 89 08">
+        <span class="field-error" id="phoneError">Numéro invalide (8 à 15 chiffres, + facultatif)</span>
+      </div>
+      <div class="field">
+        <label for="service">Prestation</label>
+        <select id="service">
+          <option value="Enregistrement">Enregistrement</option>
+          <option value="Mixage">Mixage</option>
+          <option value="Mastering">Mastering</option>
+          <option value="Production">Production</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="agenda-wrap">
+      <div>
+        <div class="cal-head">
+          <h3 id="calMonthLabel"></h3>
+          <div class="cal-nav">
+            <button type="button" onclick="calChangeMonth(-1)">&#8592;</button>
+            <button type="button" onclick="calChangeMonth(1)">&#8594;</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="calDow"></div>
+        <div class="cal-grid" id="calDays" style="margin-top:6px;"></div>
+      </div>
+      <div class="slots-box">
+        <h3 id="slotsTitle">Sélectionne un jour</h3>
+        <p class="slots-hint" id="slotsHint">Clique sur une date dans le calendrier pour voir les horaires disponibles (10h ou 18h). Un créneau "Réservé" n'est plus disponible.</p>
+        <div class="slots-grid" id="slotsGrid"></div>
+        <div class="picked-summary" id="pickedSummary"></div>
+
+        <button class="submit-btn" id="confirmBookingBtn" type="button" onclick="submitBooking()" disabled style="margin-top:18px;">Confirmer la réservation</button>
+        <div class="form-note" id="bookingFormNote" style="margin-top:10px;">Remplis ton nom, un numéro valide, puis choisis un créneau.</div>
+
+        <div class="success-banner" id="successBanner">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div>
+            <div class="success-title">Réservation confirmée</div>
+            <div class="success-sub" id="successSub"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal-box">
+    <h3>Détail de la réservation</h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-danger" id="modalDeleteBtn" onclick="modalDeleteBooking()">Supprimer</button>
+      <button type="button" class="btn-ghost-modal" onclick="closeBookingModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box confirm-box">
+    <h3 id="confirmModalTitle">Confirmer</h3>
+    <p id="confirmModalMsg"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-danger" id="confirmModalYes">Confirmer</button>
+      <button type="button" class="btn-ghost-modal" id="confirmModalNo">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="passwordModal">
+  <div class="modal-box confirm-box">
+    <h3>Mode admin</h3>
+    <p>Entre le mot de passe administrateur :</p>
+    <div class="field"><input type="password" id="passwordModalInput" autocomplete="off"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-danger" id="passwordModalOk">Valider</button>
+      <button type="button" class="btn-ghost-modal" id="passwordModalCancel">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+
 <section id="process">
   <div class="wrap">
     <div class="section-head">
@@ -456,86 +730,35 @@
 </section>
 
 <section class="contact" id="contact">
-  <div class="wrap contact-grid">
-    <div>
+  <div class="wrap">
+    <div class="section-head">
       <div class="eyebrow">Contact</div>
-      <h2 style="font-size:clamp(28px,4vw,38px); margin-bottom:20px;">Réserve ta session</h2>
-      <div class="contact-info">
-        <div class="row">
-          <span class="lbl">Téléphone</span>
-          <span class="val">+32 492 26 89 08</span>
-        </div>
-        <div class="row">
-          <span class="lbl">E-mail</span>
-          <span class="val">Pointrap.mts.be@gmail.com</span>
-        </div>
-        <div class="row">
-          <span class="lbl">Adresse</span>
-          <span class="val">Mons, Belgique — sur rendez-vous</span>
-        </div>
+      <h2>Une question avant de réserver ?</h2>
+    </div>
+    <div class="contact-info" style="max-width:480px;">
+      <div class="row">
+        <span class="lbl">Téléphone</span>
+        <span class="val">+32 492 26 89 08</span>
       </div>
-      <div class="socials">
-        <a href="https://www.instagram.com/pointrap.mts/" target="_blank" rel="noopener" class="social-btn">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
-            <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/>
-            <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
-          </svg>
-          Suivre sur Instagram
-        </a>
+      <div class="row">
+        <span class="lbl">E-mail</span>
+        <span class="val">Pointrap.mts.be@gmail.com</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Adresse</span>
+        <span class="val">Mons, Belgique — sur rendez-vous</span>
       </div>
     </div>
-    <form id="bookingForm">
-      <div class="field">
-        <label for="name">Nom complet</label>
-        <input id="name" type="text" required placeholder="Ton nom complet">
-      </div>
-      <div class="field">
-        <label for="phone">Téléphone</label>
-        <input id="phone" type="tel" required placeholder="Ex : 0492 26 89 08">
-        <span class="field-error" id="phoneError">Numéro invalide (8 à 15 chiffres, + facultatif)</span>
-      </div>
-      <div class="field">
-        <label for="service">Prestation</label>
-        <select id="service">
-          <option value="Enregistrement">Enregistrement</option>
-          <option value="Mixage">Mixage</option>
-          <option value="Mastering">Mastering</option>
-          <option value="Production">Production</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="msg">Message</label>
-        <textarea id="msg" placeholder="Ton projet, la date souhaitée"></textarea>
-      </div>
-      <button class="submit-btn" id="waBtn" type="button" onclick="sendBooking()" disabled>Envoyer sur WhatsApp</button>
-      <button class="submit-btn submit-btn-alt" id="emailBtn" type="button" onclick="showEmailChoice()" disabled>Envoyer par mail</button>
-
-      <div class="email-choice" id="emailChoice">
-        <p>Ouvrir avec :</p>
-        <div class="email-choice-btns">
-          <button type="button" class="email-choice-btn" onclick="sendEmail('gmail')">Gmail</button>
-          <button type="button" class="email-choice-btn" onclick="sendEmail('outlook')">Outlook</button>
-          <button type="button" class="email-choice-btn" onclick="sendEmail('mailto')">Application Mail</button>
-        </div>
-        <button type="button" class="email-choice-cancel" onclick="hideEmailChoice()">Annuler</button>
-      </div>
-
-      <div class="confirm-step" id="confirmStep">
-        <p id="confirmQuestion"></p>
-        <button type="button" class="confirm-btn" onclick="confirmSent()">Ça y est, j'ai envoyé</button>
-      </div>
-
-      <div class="success-banner" id="successBanner">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div>
-          <div class="success-title" id="successTitle"></div>
-          <div class="success-sub" id="successSub"></div>
-        </div>
-      </div>
-
-      <div class="form-note">Remplis ton nom et un numéro valide pour activer l'envoi.</div>
-    </form>
+    <div class="socials">
+      <a href="https://www.instagram.com/pointrap.mts/" target="_blank" rel="noopener" class="social-btn">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/>
+          <circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/>
+        </svg>
+        Suivre sur Instagram
+      </a>
+    </div>
   </div>
 </section>
 
@@ -576,6 +799,10 @@ window.addEventListener('load', function(){
   }
 });
 
+/* =====================================================================
+   FORMULAIRE (nom / téléphone / prestation)
+===================================================================== */
+
 function normalizePhone(v){
   return v.replace(/[\s\-\.\(\)]/g, '');
 }
@@ -586,7 +813,7 @@ function isValidPhone(v){
 function isFormValid(){
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
-  return name.length > 0 && isValidPhone(phone);
+  return name.length > 0 && isValidPhone(phone) && !!selectedSlot;
 }
 
 function updateFormState(){
@@ -601,148 +828,515 @@ function updateFormState(){
     phoneField.classList.remove('invalid');
   }
 
-  document.getElementById('waBtn').disabled = !valid;
-  document.getElementById('emailBtn').disabled = !valid;
+  document.getElementById('confirmBookingBtn').disabled = !valid;
 
-  const note = document.querySelector('.form-note');
-  if (!valid){
-    note.textContent = "Remplis ton nom et un numéro valide pour activer l'envoi.";
+  const note = document.getElementById('bookingFormNote');
+  if (!selectedSlot){
+    note.textContent = "Choisis un jour et une heure dans le calendrier ci-dessous.";
+  } else if (!valid){
+    note.textContent = "Remplis ton nom et un numéro valide pour confirmer.";
   } else {
-    note.textContent = "Prêt à envoyer.";
+    note.textContent = "Prêt à confirmer.";
   }
 }
 
 document.getElementById('name').addEventListener('input', updateFormState);
 document.getElementById('phone').addEventListener('input', updateFormState);
-updateFormState();
 
-function getBookingText(){
-  const name = document.getElementById('name').value;
-  const phone = document.getElementById('phone').value;
+function submitBooking(){
+  if (!isFormValid()){
+    updateFormState();
+    return;
+  }
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
   const service = document.getElementById('service').value;
-  const msg = document.getElementById('msg').value;
 
-  const body =
-    'Nom : ' + name + '\n' +
-    'Téléphone : ' + phone + '\n' +
-    'Prestation : ' + service +
-    (msg ? '\nMessage : ' + msg : '');
+  registerBooking({ name, phone, service, msg: '' });
 
-  return { name, phone, service, msg, body };
-}
-
-let pendingChannel = null;
-
-function sendBooking(){
-  if (!isFormValid()){
-    updateFormState();
-    return false;
-  }
-  const { body } = getBookingText();
-  const text = 'Réservation Point Rap\n' + body;
-
-  const waNumber = '32492268908';
-  const url = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(text);
-
-  window.open(url, '_blank');
-  pendingChannel = 'whatsapp';
-  armAutoDetect();
-  hideEmailChoice();
-  showConfirmStep("Redirection vers WhatsApp... reviens sur cet onglet une fois le message envoyé.");
-  return false;
-}
-
-function sendEmail(provider){
-  if (!isFormValid()){
-    updateFormState();
-    return false;
-  }
-  const { body } = getBookingText();
-  const to = 'Pointrap.mts.be@gmail.com';
-  const subject = 'Réservation Point Rap';
-
-  if (provider === 'gmail'){
-    const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(to) +
-      '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    window.open(url, '_blank');
-  } else if (provider === 'outlook'){
-    const url = 'https://outlook.live.com/mail/0/deeplink/compose?to=' + encodeURIComponent(to) +
-      '&subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    window.open(url, '_blank');
-  } else {
-    const url = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    window.location.href = url;
-  }
-
-  hideEmailChoice();
-  pendingChannel = 'email';
-  armAutoDetect();
-  showConfirmStep("Redirection en cours... reviens sur cet onglet une fois le mail envoyé.");
-  return false;
-}
-
-function showEmailChoice(){
-  if (!isFormValid()){
-    updateFormState();
-    return false;
-  }
-  document.getElementById('emailChoice').classList.add('visible');
-  document.getElementById('successBanner').classList.remove('visible');
-  document.querySelector('.form-note').textContent = '';
-}
-
-function hideEmailChoice(){
-  document.getElementById('emailChoice').classList.remove('visible');
-}
-
-function showConfirmStep(question){
-  document.getElementById('confirmQuestion').textContent = question;
-  document.getElementById('confirmStep').classList.add('visible');
-  document.getElementById('successBanner').classList.remove('visible');
-  document.querySelector('.form-note').textContent = '';
-}
-
-let autoDetectArmed = false;
-let leftTab = false;
-
-function armAutoDetect(){
-  autoDetectArmed = true;
-  leftTab = false;
-}
-
-// Astuce : quand WhatsApp ou l'appli mail s'ouvre, cet onglet perd le focus (il devient
-// "caché"). Quand l'utilisateur revient sur l'onglet, on considère que l'action a eu lieu
-// et on affiche automatiquement le message de validation, sans clic manuel.
-document.addEventListener('visibilitychange', function(){
-  if (!autoDetectArmed || !pendingChannel) return;
-
-  if (document.hidden){
-    leftTab = true;
-  } else if (leftTab){
-    // l'utilisateur est revenu sur l'onglet après être parti vers WhatsApp/le mail
-    autoDetectArmed = false;
-    confirmSent();
-  }
-});
-
-function confirmSent(){
-  autoDetectArmed = false;
-  document.getElementById('confirmStep').classList.remove('visible');
-
-  const title = document.getElementById('successTitle');
-  const sub = document.getElementById('successSub');
-
-  if (pendingChannel === 'whatsapp'){
-    title.textContent = 'Votre réservation est bien prise en compte.';
-    sub.textContent = 'Attendez une confirmation par message.';
-  } else if (pendingChannel === 'email'){
-    title.textContent = 'Votre réservation est bien prise en compte.';
-    sub.textContent = 'Attendez une confirmation par mail.';
-  }
+  document.getElementById('successSub').textContent =
+    'Le ' + formatDateFr(selectedSlot.date) + ' à ' + selectedSlot.time + '. À bientôt !';
   document.getElementById('successBanner').classList.add('visible');
-  document.querySelector('.form-note').textContent = '';
-  pendingChannel = null;
+
+  document.getElementById('name').value = '';
+  document.getElementById('phone').value = '';
+  selectedSlot = null;
+  document.getElementById('pickedSummary').classList.remove('visible');
+  updateFormState();
 }
+
+/* =====================================================================
+   AGENDA / RÉSERVATION EN LIGNE
+   Stockage local (localStorage) : les réservations sont conservées sur
+   cet appareil/navigateur. Pour un vrai partage entre tous les visiteurs
+   et l'admin sur plusieurs appareils, il faudrait brancher une base de
+   données côté serveur.
+===================================================================== */
+
+/* ---------- Toast & confirmation (remplace alert()/confirm() natifs,
+   qui peuvent être bloqués par le navigateur après plusieurs popups) ---------- */
+
+function showToast(message){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = message;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('visible'));
+  setTimeout(() => {
+    el.classList.remove('visible');
+    setTimeout(() => el.remove(), 300);
+  }, 2600);
+}
+
+function showConfirm(message, onYes, title){
+  const modal = document.getElementById('confirmModal');
+  document.getElementById('confirmModalTitle').textContent = title || 'Confirmer';
+  document.getElementById('confirmModalMsg').textContent = message;
+  modal.classList.add('visible');
+
+  const yesBtn = document.getElementById('confirmModalYes');
+  const noBtn = document.getElementById('confirmModalNo');
+
+  function cleanup(){
+    modal.classList.remove('visible');
+    yesBtn.removeEventListener('click', onYesClick);
+    noBtn.removeEventListener('click', onNoClick);
+  }
+  function onYesClick(){ cleanup(); onYes(); }
+  function onNoClick(){ cleanup(); }
+
+  yesBtn.addEventListener('click', onYesClick);
+  noBtn.addEventListener('click', onNoClick);
+}
+
+const ADMIN_PASSWORD = 'PointRap123?';
+// Deux créneaux possibles par jour : 10h et 18h
+const TIME_SLOTS = ['10:00','18:00'];
+const LS_BOOKINGS = 'pointrap_bookings';
+const LS_CONGES = 'pointrap_conges';
+const LS_ADMIN = 'pointrap_admin_session';
+
+let calViewDate = new Date();
+calViewDate.setDate(1);
+let selectedCalDate = null; // 'YYYY-MM-DD'
+let selectedSlot = null;    // { date, time }
+
+function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+function toDateStr(d){ return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
+function formatDateFr(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m-1, d);
+  return date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function getBookings(){
+  try { return JSON.parse(localStorage.getItem(LS_BOOKINGS)) || []; }
+  catch(e){ return []; }
+}
+function saveBookings(list){
+  localStorage.setItem(LS_BOOKINGS, JSON.stringify(list));
+}
+function getConges(){
+  try { return JSON.parse(localStorage.getItem(LS_CONGES)) || []; }
+  catch(e){ return []; }
+}
+function saveConges(list){
+  localStorage.setItem(LS_CONGES, JSON.stringify(list));
+}
+
+function registerBooking({ name, phone, service, msg }){
+  if (!selectedSlot) return;
+  const bookings = getBookings();
+  bookings.push({
+    id: Date.now() + '-' + Math.random().toString(36).slice(2,8),
+    date: selectedSlot.date,
+    time: selectedSlot.time,
+    name, phone, service, msg: msg || ''
+  });
+  saveBookings(bookings);
+
+  renderCalendarDays();
+  if (selectedCalDate) renderSlotsFor(selectedCalDate);
+}
+
+/* ---------- Calendrier ---------- */
+
+function calChangeMonth(delta){
+  calViewDate.setMonth(calViewDate.getMonth() + delta);
+  renderCalendarMonth();
+}
+
+function renderCalendarMonth(){
+  const label = calViewDate.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+  document.getElementById('calMonthLabel').textContent = label;
+
+  const dowNames = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+  const dowEl = document.getElementById('calDow');
+  dowEl.innerHTML = dowNames.map(d => '<div class="cal-dow">' + d + '</div>').join('');
+
+  renderCalendarDays();
+}
+
+function renderCalendarDays(){
+  const daysEl = document.getElementById('calDays');
+  daysEl.innerHTML = '';
+
+  const year = calViewDate.getFullYear();
+  const month = calViewDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  // lundi = 0
+  let startOffset = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const bookings = getBookings();
+  const conges = getConges();
+
+  for (let i = 0; i < startOffset; i++){
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    daysEl.appendChild(empty);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++){
+    const cellDate = new Date(year, month, day);
+    const dateStr = toDateStr(cellDate);
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+    cell.textContent = day;
+
+    const isPast = cellDate < today;
+    const conge = conges.find(c => dateStr >= c.start && dateStr <= c.end);
+    const isConge = !!conge;
+    const hasBookings = bookings.some(b => b.date === dateStr);
+
+    if (isPast){
+      cell.classList.add('disabled');
+    } else if (isConge){
+      cell.classList.add('conge');
+      cell.title = 'Congé du ' + formatDateFr(conge.start) + ' au ' + formatDateFr(conge.end);
+      cell.addEventListener('click', () => {
+        showToast('Congé du ' + formatDateFr(conge.start) + ' au ' + formatDateFr(conge.end) + ' — réservation impossible sur cette période.');
+      });
+    } else {
+      cell.addEventListener('click', () => selectCalDay(dateStr));
+    }
+
+    if (hasBookings && !isPast) cell.classList.add('has-bookings');
+    if (dateStr === selectedCalDate) cell.classList.add('selected');
+
+    daysEl.appendChild(cell);
+  }
+}
+
+function selectCalDay(dateStr){
+  selectedCalDate = dateStr;
+  renderCalendarDays();
+  renderSlotsFor(dateStr);
+}
+
+function renderSlotsFor(dateStr){
+  const title = document.getElementById('slotsTitle');
+  const hint = document.getElementById('slotsHint');
+  const grid = document.getElementById('slotsGrid');
+
+  title.textContent = formatDateFr(dateStr);
+  hint.style.display = 'none';
+  grid.innerHTML = '';
+
+  const bookings = getBookings().filter(b => b.date === dateStr);
+  const isAdmin = isAdminActive();
+
+  TIME_SLOTS.forEach(time => {
+    const booking = bookings.find(b => b.time === time);
+    const btn = document.createElement('div');
+    btn.className = 'slot-btn';
+    btn.textContent = booking ? (time + ' · Réservé') : time;
+
+    if (booking){
+      btn.classList.add('taken');
+      if (isAdmin){
+        btn.title = 'Cliquer pour voir le détail';
+        btn.addEventListener('click', () => openBookingModal(booking));
+      } else {
+        btn.title = 'Ce créneau est déjà réservé';
+        btn.addEventListener('click', () => {
+          showToast('Ce créneau est déjà réservé. Choisis une autre heure.');
+        });
+      }
+    } else {
+      if (selectedSlot && selectedSlot.date === dateStr && selectedSlot.time === time){
+        btn.classList.add('picked');
+      }
+      btn.addEventListener('click', () => pickSlot(dateStr, time));
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function pickSlot(dateStr, time){
+  selectedSlot = { date: dateStr, time };
+  renderSlotsFor(dateStr);
+
+  const summary = document.getElementById('pickedSummary');
+  summary.classList.add('visible');
+  summary.textContent = 'Créneau sélectionné : ' + formatDateFr(dateStr) + ' à ' + time;
+
+  updateFormState();
+}
+
+/* ---------- Modal détail réservation (admin) ---------- */
+
+let modalBookingId = null;
+
+function openBookingModal(booking){
+  modalBookingId = booking.id;
+  const body = document.getElementById('modalBody');
+  body.innerHTML =
+    modalRow('Nom', booking.name) +
+    modalRow('Téléphone', booking.phone) +
+    modalRow('Prestation', booking.service) +
+    modalRow('Date', formatDateFr(booking.date)) +
+    modalRow('Heure', booking.time) +
+    (booking.msg ? modalRow('Message', booking.msg) : '');
+  document.getElementById('bookingModal').classList.add('visible');
+}
+function modalRow(lbl, val){
+  return '<div class="modal-row"><span class="lbl">' + lbl + '</span><span class="val">' + escapeHtml(val || '') + '</span></div>';
+}
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function closeBookingModal(){
+  document.getElementById('bookingModal').classList.remove('visible');
+  modalBookingId = null;
+}
+function modalDeleteBooking(){
+  if (!modalBookingId) return;
+  showConfirm('Supprimer définitivement ce rendez-vous ?', () => {
+    const bookings = getBookings().filter(b => b.id !== modalBookingId);
+    saveBookings(bookings);
+    closeBookingModal();
+    renderCalendarDays();
+    if (selectedCalDate) renderSlotsFor(selectedCalDate);
+    if (isAdminActive()) renderAdminBookingsList();
+    showToast('Rendez-vous bien supprimé.');
+  });
+}
+
+/* ---------- Mode admin ---------- */
+
+function isAdminActive(){
+  return sessionStorage.getItem(LS_ADMIN) === 'yes';
+}
+
+function toggleAdminPrompt(){
+  if (isAdminActive()){
+    // Déjà connecté : on ramène juste la barre admin en vue,
+    // il faut cliquer "Gérer l'agenda" pour ouvrir la popup (identique PC/mobile)
+    const bar = document.getElementById('adminBar');
+    if (bar) bar.scrollIntoView({ behavior:'smooth', block:'start' });
+    return;
+  }
+  const modal = document.getElementById('passwordModal');
+  const input = document.getElementById('passwordModalInput');
+  input.value = '';
+  modal.classList.add('visible');
+  setTimeout(() => input.focus(), 50);
+
+  const okBtn = document.getElementById('passwordModalOk');
+  const cancelBtn = document.getElementById('passwordModalCancel');
+
+  function cleanup(){
+    modal.classList.remove('visible');
+    okBtn.removeEventListener('click', onOk);
+    cancelBtn.removeEventListener('click', onCancel);
+    input.removeEventListener('keydown', onKeydown);
+  }
+  function onOk(){
+    const pass = input.value;
+    cleanup();
+    if (pass === ADMIN_PASSWORD){
+      sessionStorage.setItem(LS_ADMIN, 'yes');
+      initAdminUI();
+    } else if (pass){
+      showToast('Mot de passe incorrect.');
+    }
+  }
+  function onCancel(){ cleanup(); }
+  function onKeydown(e){ if (e.key === 'Enter') onOk(); if (e.key === 'Escape') onCancel(); }
+
+  okBtn.addEventListener('click', onOk);
+  cancelBtn.addEventListener('click', onCancel);
+  input.addEventListener('keydown', onKeydown);
+}
+
+function logoutAdmin(){
+  sessionStorage.removeItem(LS_ADMIN);
+  document.getElementById('adminBar').classList.remove('visible');
+  document.getElementById('adminPanel').classList.remove('visible');
+  document.getElementById('adminMenuLink').textContent = 'Mode admin';
+  document.getElementById('adminMenuLinkDesktop').textContent = 'Mode admin';
+  if (selectedCalDate) renderSlotsFor(selectedCalDate);
+}
+
+function initAdminUI(){
+  document.getElementById('adminBar').classList.add('visible');
+  document.getElementById('adminMenuLink').textContent = 'Mode admin (actif)';
+  document.getElementById('adminMenuLinkDesktop').textContent = 'Mode admin (actif)';
+  populateAdminTimeSelect();
+  renderAdminBookingsList();
+  renderAdminCongesList();
+  if (selectedCalDate) renderSlotsFor(selectedCalDate);
+}
+
+function toggleAdminPanel(){
+  document.getElementById('adminPanel').classList.toggle('visible');
+}
+
+function populateAdminTimeSelect(){
+  const sel = document.getElementById('admTime');
+  sel.innerHTML = TIME_SLOTS.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+}
+
+function adminAddBooking(){
+  const name = document.getElementById('admName').value.trim();
+  const phone = document.getElementById('admPhone').value.trim();
+  const service = document.getElementById('admService').value;
+  const date = document.getElementById('admDate').value;
+  const time = document.getElementById('admTime').value;
+  const msg = document.getElementById('admMsg').value.trim();
+
+  if (!name || !date || !time){
+    showToast('Merci de remplir au moins le nom, la date et l\'heure.');
+    return;
+  }
+
+  const bookings = getBookings();
+  if (bookings.some(b => b.date === date && b.time === time)){
+    showToast('Ce créneau est déjà pris.');
+    return;
+  }
+
+  bookings.push({
+    id: Date.now() + '-' + Math.random().toString(36).slice(2,8),
+    date, time, name, phone, service, msg
+  });
+  saveBookings(bookings);
+
+  document.getElementById('admName').value = '';
+  document.getElementById('admPhone').value = '';
+  document.getElementById('admMsg').value = '';
+
+  renderCalendarDays();
+  if (selectedCalDate === date) renderSlotsFor(date);
+  renderAdminBookingsList();
+  showToast('Rendez-vous bien ajouté.');
+}
+
+function adminAddConge(){
+  const start = document.getElementById('admCongeStart').value;
+  const end = document.getElementById('admCongeEnd').value;
+  if (!start || !end){ showToast('Choisis une date de début et une date de fin.'); return; }
+  if (end < start){ showToast('La date de fin doit être après la date de début.'); return; }
+  const conges = getConges();
+  conges.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,8), start, end });
+  saveConges(conges);
+  document.getElementById('admCongeStart').value = '';
+  document.getElementById('admCongeEnd').value = '';
+  renderCalendarDays();
+  if (selectedCalDate) renderSlotsFor(selectedCalDate);
+  renderAdminCongesList();
+  showToast('Congé bien ajouté.');
+}
+
+function renderAdminCongesList(){
+  const list = document.getElementById('adminCongesList');
+  const conges = getConges().slice().sort((a,b) => a.start.localeCompare(b.start));
+
+  if (!conges.length){
+    list.innerHTML = '<div class="slots-hint">Aucun congé enregistré.</div>';
+    return;
+  }
+
+  list.innerHTML = conges.map(c =>
+    '<div class="admin-list-item">' +
+      '<span>Du ' + escapeHtml(formatDateFr(c.start)) + ' au ' + escapeHtml(formatDateFr(c.end)) + '</span>' +
+      '<button type="button" onclick="adminDeleteConge(\'' + c.id + '\')">Supprimer</button>' +
+    '</div>'
+  ).join('');
+}
+
+function adminDeleteConge(id){
+  showConfirm('Supprimer cette période de congé ?', () => {
+    const conges = getConges().filter(c => c.id !== id);
+    saveConges(conges);
+    renderCalendarDays();
+    if (selectedCalDate) renderSlotsFor(selectedCalDate);
+    renderAdminCongesList();
+    showToast('Congé bien supprimé.');
+  });
+}
+
+function renderAdminBookingsList(){
+  const list = document.getElementById('adminBookingsList');
+  const bookings = getBookings().slice().sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+
+  if (!bookings.length){
+    list.innerHTML = '<div class="slots-hint">Aucun rendez-vous enregistré.</div>';
+    return;
+  }
+
+  list.innerHTML = bookings.map(b =>
+    '<div class="admin-list-item">' +
+      '<span>' + escapeHtml(b.date) + ' à ' + escapeHtml(b.time) + ' — ' + escapeHtml(b.name) + ' · ' + escapeHtml(b.phone) + ' (' + escapeHtml(b.service) + ')</span>' +
+      '<button type="button" onclick="adminDeleteBooking(\'' + b.id + '\')">Supprimer</button>' +
+    '</div>'
+  ).join('');
+}
+
+function adminDeleteBooking(id){
+  showConfirm('Supprimer ce rendez-vous ?', () => {
+    const bookings = getBookings().filter(b => b.id !== id);
+    saveBookings(bookings);
+    renderCalendarDays();
+    if (selectedCalDate) renderSlotsFor(selectedCalDate);
+    renderAdminBookingsList();
+    showToast('Rendez-vous bien supprimé.');
+  });
+}
+
+/* ---------- Init ---------- */
+
+document.addEventListener('DOMContentLoaded', function(){
+  renderCalendarMonth();
+  updateFormState();
+  if (isAdminActive()) initAdminUI();
+
+  // Liaison robuste des boutons "Mode admin" (au lieu d'onclick inline,
+  // pour éviter les soucis rencontrés sur Safari iOS)
+  function bindAdminButton(btn, isMobile){
+    if (!btn) return;
+    let handled = false;
+    function trigger(e){
+      if (handled) return;
+      handled = true;
+      setTimeout(() => { handled = false; }, 400);
+      if (e) e.preventDefault();
+      if (isMobile) closeMenu();
+      toggleAdminPrompt();
+    }
+    btn.addEventListener('touchend', trigger, { passive: false });
+    btn.addEventListener('click', trigger);
+  }
+  bindAdminButton(document.getElementById('adminMenuLinkDesktop'), false);
+  bindAdminButton(document.getElementById('adminMenuLink'), true);
+});
 </script>
 
 </body>
